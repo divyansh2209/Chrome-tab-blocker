@@ -1,0 +1,31 @@
+{
+    "manifest_version": 3,
+    "name": "Chrome tab blocker",
+    "description": "Runs a script on www.example.com automatically when user installs the extension",
+    "version": "1.0.0",
+    "icons": {
+    "16": "icon.png",
+    "32": "icon.png",
+    "48": "icon.png"
+    },
+    "permissions": [
+        "tabs",
+        "bookmarks",
+        "storage",
+        "identity"
+    ],
+    "action" : {
+        "default_title": "Chrome tab blocker",   
+        "default_popup": "popup.html"
+    },
+    "options_page": "options.html",
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["contentScript.js"]
+        }
+    ]
+}
