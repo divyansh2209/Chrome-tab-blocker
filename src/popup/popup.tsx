@@ -4,56 +4,59 @@ import { createRoot } from "react-dom/client";
 
 
 const Popup = () => {
-    const [websiteURL, setWebsiteURL] = useState<string>('');
-    const [blockedSites, setBlockedSites] = useState<string[]>([]);
+    const [blockedWebsites, setBlockedWebsites] = useState<string[]>([]);
+    const [newWebsite, setNewWebsite] = useState<string>('');
 
     useEffect(() => {
-        // Ensure the chrome storage API is available
-        if (chrome && chrome.storage && chrome.storage.local) {
-            chrome.storage.local.get(["blocked"], (local) => {
-                const { blocked } = local as { blocked: string[] };
-                if (Array.isArray(blocked)) {
-                    setBlockedSites(blocked);
-                }
-            });
-        }
+        // Load blocked websites from chrome storage
+        chrome.storage.local.get(['blocked'], (result) => {
+            if (Array.isArray(result.blocked)) {
+                setBlockedWebsites(result.blocked);
+            }
+        });
     }, []);
 
-    const handleSaveClick = (event: React.FormEvent) => {
+    const handleAddWebsite = (event: React.FormEvent) => {
         event.preventDefault();
-        if (websiteURL.trim() !== '') {
-            const newBlockedSites = [...blockedSites, websiteURL.trim()];
-            setBlockedSites(newBlockedSites);
-            if (chrome && chrome.storage && chrome.storage.local) {
-                chrome.storage.local.set({ blocked: newBlockedSites });
-            }
-            setWebsiteURL('');
+        if (newWebsite.trim()) {
+            const updatedBlockedWebsites = [...blockedWebsites, newWebsite.trim()];
+            setBlockedWebsites(updatedBlockedWebsites);
+            chrome.storage.local.set({ blocked: updatedBlockedWebsites });
+            setNewWebsite('');
         }
     };
 
+    const handleDeleteWebsite = (website: string) => {
+        const updatedBlockedWebsites = blockedWebsites.filter((item) => item !== website);
+        setBlockedWebsites(updatedBlockedWebsites);
+        chrome.storage.local.set({ blocked: updatedBlockedWebsites });
+    };
+
     return (
-        <div>
-            <form onSubmit={handleSaveClick} className="flex justify-center py-5">
+        <div className="App">
+            <h1>Blocked Websites</h1>
+            <form onSubmit={handleAddWebsite} className="flex justify-center py-5">
                 <input
                     type="text"
-                    name="name"
-                    className="bg-slate-300 ring-black px-4 py-4"
+                    value={newWebsite}
+                    onChange={(e) => setNewWebsite(e.target.value)}
+                    className="bg-slate-300s ring-black px-4 py-4"
                     placeholder="Enter website URL"
-                    value={websiteURL}
-                    onChange={(e) => setWebsiteURL(e.target.value)}
                 />
                 <button type="submit" className="py-4 px-3 bg-indigo-500 text-white m-2">
                     Submit
                 </button>
             </form>
-            <div>
-                <h2>Blocked Websites</h2>
-                <ul>
-                    {blockedSites.map((site, index) => (
-                        <li key={index}>{site}</li>
-                    ))}
-                </ul>
-            </div>
+            <ul>
+                {blockedWebsites.map((website) => (
+                    <li key={website} className="flex justify-between items-center">
+                        <span>{website}</span>
+                        <button onClick={() => handleDeleteWebsite(website)} className="ml-2 text-red-500">
+                            Delete
+                        </button>
+                    </li>
+                ))}
+            </ul>
         </div>
     );
 };
