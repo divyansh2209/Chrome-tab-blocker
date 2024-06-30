@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Chrome tab blocker",
-    "description": "Runs a script on www.example.com automatically when user installs the extension",
+    "description": "This Chrome extension allows users to block and manage websites by adding or editing URLs through a user-friendly interface. It features enable/disable functionality and real-time synchronization using React and TypeScript.",
     "version": "1.0.0",
     "icons": {
     "16": "icon.png",
